@@ -1,7 +1,10 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:random_string/random_string.dart';
 import 'package:shopping_app_1/pages/bottomnav.dart';
 import 'package:shopping_app_1/pages/login.dart';
+import 'package:shopping_app_1/services/database.dart';
+import 'package:shopping_app_1/services/shared_pref.dart';
 
 import '../widget/support_widget.dart';
 
@@ -18,6 +21,15 @@ class _SignUpState extends State<SignUp> {
   TextEditingController nameController = new TextEditingController();
   TextEditingController emailController = new TextEditingController();
   TextEditingController passwordController = new TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    // Thiết lập ngôn ngữ cho Firebase thành tiếng Việt
+    FirebaseAuth.instance.setLanguageCode("vi");
+    print(FirebaseAuth.instance.languageCode); // In ra ngôn ngữ hiện tại
+  }
+
   registertion() async {
     if (password != null && name != null && email != null) {
       try {
@@ -30,6 +42,20 @@ class _SignUpState extends State<SignUp> {
               "Registered Successfully",
               style: TextStyle(fontSize: 20.0),
             )));
+        String Id = randomAlphaNumeric(10);
+        await SharedPreferenceHelper().saveUserEmail(emailController.text);
+        await SharedPreferenceHelper().saveUserId(Id);
+        await SharedPreferenceHelper().saveUserName(nameController.text);
+        await SharedPreferenceHelper().saveUserImage(
+            "https://hoidulich.net/wp-content/uploads/2021/07/Top-10-buc-anh-dep-nhat-giai-Nhiep-anh-thien-van-cua-nam.jpg");
+        Map<String, dynamic> userInfoMap = {
+          "Name": nameController.text,
+          "Email": emailController.text,
+          "Id": Id,
+          "Image":
+              "https://hoidulich.net/wp-content/uploads/2021/07/Top-10-buc-anh-dep-nhat-giai-Nhiep-anh-thien-van-cua-nam.jpg",
+        };
+        await DatabaseMethods().addUserDetails(userInfoMap, Id);
         Navigator.push(
             context, MaterialPageRoute(builder: (context) => BottomNav()));
       } on FirebaseException catch (e) {
