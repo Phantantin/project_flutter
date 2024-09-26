@@ -37,7 +37,7 @@ class _SignUpState extends State<SignUp> {
             .createUserWithEmailAndPassword(email: email!, password: password!);
 
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-            backgroundColor: Colors.redAccent,
+            backgroundColor: Colors.greenAccent,
             content: Text(
               "Registered Successfully",
               style: TextStyle(fontSize: 20.0),
@@ -57,7 +57,7 @@ class _SignUpState extends State<SignUp> {
         };
         await DatabaseMethods().addUserDetails(userInfoMap, Id);
         Navigator.push(
-            context, MaterialPageRoute(builder: (context) => BottomNav()));
+            context, MaterialPageRoute(builder: (context) => LogIn()));
       } on FirebaseException catch (e) {
         if (e.code == "weak-password") {
           ScaffoldMessenger.of(context).showSnackBar(SnackBar(
@@ -178,7 +178,7 @@ class _SignUpState extends State<SignUp> {
                     obscureText: true,
                     validator: (value) {
                       if (value == null || value.isEmpty) {
-                        return "please Enter Your Password";
+                        return "Please Enter Your Password";
                       }
                       return null;
                     },
