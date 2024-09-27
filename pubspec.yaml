@@ -41,6 +41,9 @@ dependencies:
   firebase_auth: ^5.3.0
   random_string: ^2.3.1
   shared_preferences: 
+  image_picker: 
+  firebase_storage: 
+  permission_handler:
 
 dev_dependencies:
   flutter_test:
