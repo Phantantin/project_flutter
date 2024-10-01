@@ -2,7 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:shopping_app_1/widget/support_widget.dart';
 
 class ProductDetail extends StatefulWidget {
-  const ProductDetail({super.key});
+  String image, name, detail, price;
+  ProductDetail(
+      {required this.detail,
+      required this.image,
+      required this.name,
+      required this.price});
 
   @override
   State<ProductDetail> createState() => _ProductDetailState();
@@ -33,8 +38,8 @@ class _ProductDetailState extends State<ProductDetail> {
                       child: Icon(Icons.arrow_back_ios_new_outlined)),
                 ),
                 Center(
-                  child: Image.asset(
-                    "images/headphone2.png",
+                  child: Image.network(
+                    widget.image,
                     height: 400,
                   ),
                 )
@@ -56,10 +61,10 @@ class _ProductDetailState extends State<ProductDetail> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
-                          "Headphone",
+                          widget.name,
                           style: AppWidget.boldTextFeildStyle(),
                         ),
-                        Text("\$300",
+                        Text("\$" + widget.price,
                             style: TextStyle(
                                 color: Color(0xFFfd6f3e),
                                 fontSize: 23.0,
@@ -76,8 +81,7 @@ class _ProductDetailState extends State<ProductDetail> {
                     SizedBox(
                       height: 10.0,
                     ),
-                    Text(
-                        "The product is very good. It have a 1 year waranty. These heaphones are to good like you can also listen a person who is speaking slowly. But be aware of shiwam he speaks very loudly."),
+                    Text(widget.detail),
                     SizedBox(
                       height: 160.0,
                     ),
