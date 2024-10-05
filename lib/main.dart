@@ -1,14 +1,17 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:shopping_app_1/Admin/add_product.dart';
 import 'package:shopping_app_1/Admin/admin_login.dart';
 import 'package:shopping_app_1/pages/bottomnav.dart';
 import 'package:shopping_app_1/pages/home.dart';
 import 'package:shopping_app_1/pages/onboarding.dart';
 import 'package:shopping_app_1/pages/signup.dart';
+import 'package:shopping_app_1/services/constant.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  Stripe.publishableKey = publishablekey;
   await Firebase.initializeApp();
   runApp(const MyApp());
 }
@@ -41,7 +44,7 @@ class MyApp extends StatelessWidget {
           colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
           useMaterial3: true,
         ),
-        home: SignUp());
+        home: BottomNav());
   }
 }
 
