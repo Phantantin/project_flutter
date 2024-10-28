@@ -3,6 +3,8 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:shopping_app_1/services/constant.dart';
+import 'package:shopping_app_1/services/database.dart';
+import 'package:shopping_app_1/services/shared_pref.dart';
 import 'package:shopping_app_1/widget/support_widget.dart';
 import 'package:http/http.dart' as http;
 
@@ -19,6 +21,26 @@ class ProductDetail extends StatefulWidget {
 }
 
 class _ProductDetailState extends State<ProductDetail> {
+  String? name, email, image;
+
+  getthesharedpref() async {
+    name = await SharedPreferenceHelper().getUserName();
+    email = await SharedPreferenceHelper().getUserEmail();
+    image = await SharedPreferenceHelper().getUserImage();
+    setState(() {});
+  }
+
+  ontheload() async {
+    await getthesharedpref();
+    setState(() {});
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    ontheload();
+  }
+
   Map<String, dynamic>? paymentIntent;
 
   @override
@@ -143,6 +165,16 @@ class _ProductDetailState extends State<ProductDetail> {
   displayPaymentSheet() async {
     try {
       await Stripe.instance.presentPaymentSheet().then((value) async {
+        Map<String, dynamic> orderInfoMap = {
+          'Product': widget.name,
+          'Price': widget.price,
+          'Name': name,
+          'Email': email,
+          'Image': image,
+          'ProductImage': widget.image,
+          'Status': "On the way",
+        };
+        await DatabaseMethods().orderDetails(orderInfoMap);
         showDialog(
             context: context,
             builder: (_) => AlertDialog(
