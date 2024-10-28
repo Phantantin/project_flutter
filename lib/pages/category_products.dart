@@ -5,7 +5,7 @@ import 'package:shopping_app_1/services/database.dart';
 import 'package:shopping_app_1/widget/support_widget.dart';
 
 class CategoryProduct extends StatefulWidget {
-  String category;
+  final String category;
   CategoryProduct({required this.category});
 
   @override
@@ -14,6 +14,7 @@ class CategoryProduct extends StatefulWidget {
 
 class _CategoryProductState extends State<CategoryProduct> {
   Stream? CategoryStream;
+
   getontheload() async {
     CategoryStream = await DatabaseMethods().getProducts(widget.category);
     setState(() {});
@@ -27,92 +28,99 @@ class _CategoryProductState extends State<CategoryProduct> {
 
   Widget allProducts() {
     return StreamBuilder(
-        stream: CategoryStream,
-        builder: (context, AsyncSnapshot snapshot) {
-          return snapshot.hasData
-              ? GridView.builder(
-                  padding: EdgeInsets.zero,
-                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 2,
-                      childAspectRatio: 0.6,
-                      mainAxisSpacing: 10.0,
-                      crossAxisSpacing: 10.0),
-                  itemCount: snapshot.data.docs.length,
-                  itemBuilder: (context, index) {
-                    DocumentSnapshot ds = snapshot.data.docs[index];
-                    print("Image URL: ${ds["Image"]}");
+      stream: CategoryStream,
+      builder: (context, AsyncSnapshot snapshot) {
+        return snapshot.hasData
+            ? GridView.builder(
+                padding: EdgeInsets.zero,
+                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 2,
+                  childAspectRatio: 0.6,
+                  mainAxisSpacing: 10.0,
+                  crossAxisSpacing: 10.0,
+                ),
+                itemCount: snapshot.data.docs.length,
+                itemBuilder: (context, index) {
+                  DocumentSnapshot ds = snapshot.data.docs[index];
+                  print("Image URL: ${ds["Image"]}");
 
-                    return Container(
-                      padding: EdgeInsets.symmetric(
-                          horizontal: 17.0, vertical: 10.0),
-                      decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(10)),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          SizedBox(
-                            height: 10.0,
-                          ),
-                          Image.network(
-                            ds["Image"],
-                            height: 150,
-                            width: 150,
-                            fit: BoxFit.cover,
-                            errorBuilder: (context, error, stackTrace) {
-                              return Icon(Icons.broken_image, size: 150);
-                            },
-                          ),
-                          SizedBox(
-                            height: 10.0,
-                          ),
-                          Text(
+                  return Container(
+                    padding:
+                        EdgeInsets.symmetric(horizontal: 10.0, vertical: 10.0),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        SizedBox(height: 10.0),
+                        Image.network(
+                          ds["Image"],
+                          height: 120,
+                          width: double.infinity,
+                          fit: BoxFit.cover,
+                          errorBuilder: (context, error, stackTrace) {
+                            return Icon(Icons.broken_image, size: 120);
+                          },
+                        ),
+                        SizedBox(height: 10.0),
+                        Expanded(
+                          child: Text(
                             ds["Name"],
                             style: AppWidget.semiboldTextFeildStyle(),
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 2,
                           ),
-                          Spacer(),
-                          Row(
-                            children: [
-                              Text(
-                                "\$" + ds["Price"],
-                                style: TextStyle(
-                                    color: Color(0xFFfd6f3e),
-                                    fontSize: 22.0,
-                                    fontWeight: FontWeight.bold),
+                        ),
+                        Spacer(),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              "\$${ds["Price"]}",
+                              style: TextStyle(
+                                color: Color(0xFFfd6f3e),
+                                fontSize: 20.0,
+                                fontWeight: FontWeight.bold,
                               ),
-                              SizedBox(
-                                width: 30.0,
-                              ),
-                              GestureDetector(
-                                onTap: () {
-                                  Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (context) => ProductDetail(
-                                              detail: ds["Detail"],
-                                              image: ds["Image"],
-                                              name: ds["Name"],
-                                              price: ds["Price"])));
-                                },
-                                child: Container(
-                                  padding: EdgeInsets.all(5),
-                                  decoration: BoxDecoration(
-                                      color: Color(0xFFfd6f3e),
-                                      borderRadius: BorderRadius.circular(7)),
-                                  child: Icon(
-                                    Icons.add,
-                                    color: Colors.white,
+                            ),
+                            GestureDetector(
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => ProductDetail(
+                                      detail: ds["Detail"],
+                                      image: ds["Image"],
+                                      name: ds["Name"],
+                                      price: ds["Price"],
+                                    ),
                                   ),
+                                );
+                              },
+                              child: Container(
+                                padding: EdgeInsets.all(5),
+                                decoration: BoxDecoration(
+                                  color: Color(0xFFfd6f3e),
+                                  borderRadius: BorderRadius.circular(7),
+                                ),
+                                child: Icon(
+                                  Icons.add,
+                                  color: Colors.white,
                                 ),
                               ),
-                            ],
-                          )
-                        ],
-                      ),
-                    );
-                  })
-              : Container();
-        });
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  );
+                },
+              )
+            : Center(child: CircularProgressIndicator());
+      },
+    );
   }
 
   @override
@@ -122,10 +130,12 @@ class _CategoryProductState extends State<CategoryProduct> {
       appBar: AppBar(
         backgroundColor: Color(0xfff2f2f2),
       ),
-      body: Container(
-        margin: EdgeInsets.only(left: 20.0, right: 20.0),
+      body: Padding(
+        padding: EdgeInsets.symmetric(horizontal: 20.0),
         child: Column(
-          children: [Expanded(child: allProducts())],
+          children: [
+            Expanded(child: allProducts()),
+          ],
         ),
       ),
     );
