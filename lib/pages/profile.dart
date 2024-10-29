@@ -35,11 +35,24 @@ class _ProfileState extends State<Profile> {
     super.initState();
   }
 
+  // Future getImage() async {
+  //   var image = await _picker.pickImage(source: ImageSource.gallery);
+  //   selectedImage = File(image!.path);
+  //   uploadItem();
+  //   setState(() {});
+  // }
+
   Future getImage() async {
     var image = await _picker.pickImage(source: ImageSource.gallery);
-    selectedImage = File(image!.path);
-    uploadItem();
-    setState(() {});
+
+    // Kiểm tra nếu image không null
+    if (image != null) {
+      selectedImage = File(image.path);
+      uploadItem();
+      setState(() {});
+    } else {
+      print("No image selected");
+    }
   }
 
   uploadItem() async {

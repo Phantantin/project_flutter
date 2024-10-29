@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
@@ -9,12 +10,14 @@ import 'package:shopping_app_1/widget/support_widget.dart';
 import 'package:http/http.dart' as http;
 
 class ProductDetail extends StatefulWidget {
-  String image, name, detail, price;
-  ProductDetail(
-      {required this.detail,
-      required this.image,
-      required this.name,
-      required this.price});
+  final String image, name, detail, price;
+
+  ProductDetail({
+    required this.detail,
+    required this.image,
+    required this.name,
+    required this.price,
+  });
 
   @override
   State<ProductDetail> createState() => _ProductDetailState();
@@ -22,6 +25,14 @@ class ProductDetail extends StatefulWidget {
 
 class _ProductDetailState extends State<ProductDetail> {
   String? name, email, image;
+
+  Map<String, dynamic>? paymentIntent;
+
+  @override
+  void initState() {
+    super.initState();
+    ontheload();
+  }
 
   getthesharedpref() async {
     name = await SharedPreferenceHelper().getUserName();
@@ -32,16 +43,7 @@ class _ProductDetailState extends State<ProductDetail> {
 
   ontheload() async {
     await getthesharedpref();
-    setState(() {});
   }
-
-  @override
-  void initState() {
-    super.initState();
-    ontheload();
-  }
-
-  Map<String, dynamic>? paymentIntent;
 
   @override
   Widget build(BuildContext context) {
@@ -76,7 +78,7 @@ class _ProductDetailState extends State<ProductDetail> {
             ),
             Expanded(
               child: Container(
-                padding: EdgeInsets.only(top: 20.0, left: 20.0, right: 20.0),
+                padding: EdgeInsets.symmetric(horizontal: 20.0, vertical: 20.0),
                 decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.only(
@@ -111,9 +113,7 @@ class _ProductDetailState extends State<ProductDetail> {
                       height: 10.0,
                     ),
                     Text(widget.detail),
-                    SizedBox(
-                      height: 160.0,
-                    ),
+                    Spacer(),
                     GestureDetector(
                       onTap: () {
                         makePayment(widget.price);
@@ -148,17 +148,18 @@ class _ProductDetailState extends State<ProductDetail> {
   Future<void> makePayment(String amount) async {
     try {
       paymentIntent = await createPaymentIntent(amount, "usd");
-      await Stripe.instance
-          .initPaymentSheet(
-              paymentSheetParameters: SetupPaymentSheetParameters(
-                  paymentIntentClientSecret: paymentIntent?['client_secret'],
-                  style: ThemeMode.dark,
-                  merchantDisplayName: "Teo"))
-          .then((value) {});
-
-      displayPaymentSheet();
+      if (paymentIntent != null) {
+        await Stripe.instance.initPaymentSheet(
+          paymentSheetParameters: SetupPaymentSheetParameters(
+            paymentIntentClientSecret: paymentIntent?['client_secret'],
+            style: ThemeMode.dark,
+            merchantDisplayName: "Teo",
+          ),
+        );
+        displayPaymentSheet();
+      }
     } catch (e, s) {
-      print("exception:&e$s");
+      print("Exception: $e\nStackTrace: $s");
     }
   }
 
@@ -187,25 +188,22 @@ class _ProductDetailState extends State<ProductDetail> {
                             Icons.check_circle,
                             color: Colors.green,
                           ),
-                          Text("Payment Successfull")
+                          Text("Payment Successful")
                         ],
                       )
                     ],
                   ),
                 ));
         paymentIntent = null;
-      }).onError((error, stackTrace) {
-        print("Error is : ---> $error $stackTrace");
       });
     } on StripeException catch (e) {
-      print("Error is:---> $e");
+      print("Error: $e");
       showDialog(
           context: context,
           builder: (_) => AlertDialog(
-                content: Text("Canelled"),
+                content: Text("Cancelled"),
               ));
-    } catch (e) {
-      print("$e");
+      paymentIntent = null;
     }
   }
 
@@ -214,26 +212,22 @@ class _ProductDetailState extends State<ProductDetail> {
       Map<String, dynamic> body = {
         'amount': calculateAmount(amount),
         'currency': currency,
-        'payment_method_types[]': 'card'
+        'payment_method_types[]': 'card',
       };
-
-      // Chuyển body thành URL-encoded string
-      var bodyString = body.entries
-          .map((e) =>
-              '${Uri.encodeComponent(e.key)}=${Uri.encodeComponent(e.value)}')
-          .join('&');
-
       var response = await http.post(
           Uri.parse('https://api.stripe.com/v1/payment_intents'),
           headers: {
             'Authorization': 'Bearer $secretkey',
             'Content-Type': 'application/x-www-form-urlencoded',
           },
-          body: bodyString); // Truyền URL-encoded body
-
+          body: body.entries
+              .map((e) =>
+                  '${Uri.encodeComponent(e.key)}=${Uri.encodeComponent(e.value)}')
+              .join('&'));
       return jsonDecode(response.body);
     } catch (err) {
-      print('err charging user: ${err.toString()}');
+      print('Error charging user: ${err.toString()}');
+      return null;
     }
   }
 
@@ -242,3 +236,12 @@ class _ProductDetailState extends State<ProductDetail> {
     return calculateAmount.toString();
   }
 }
+
+void saveToFile(String content, String filename) async {
+  final file = File('/mnt/data/$filename.txt');
+  await file.writeAsString(content);
+  print("File saved as $filename.txt");
+}
+
+// Usage example:
+// saveToFile('Source code content here', 'ProductDetailSourceCode');
