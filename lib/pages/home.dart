@@ -36,8 +36,29 @@ class _HomeState extends State<Home> {
       search = true;
     });
 
-    var capitalzedValue =
-        value.substring(0, 1).toUpperCase() + value.substring(1);
+    // var capitalzedValue =
+    //     value.substring(0, 1).toUpperCase() + value.substring(1);
+    // if (queryResultSet.isEmpty && value.length == 1) {
+    //   DatabaseMethods().search(value).then((QuerySnapshot docs) {
+    //     for (int i = 0; i < docs.docs.length; ++i) {
+    //       queryResultSet.add(docs.docs[i].data());
+    //     }
+    //   });
+    // } else {
+    //   tempSearchStore = [];
+    //   queryResultSet.forEach((element) {
+    //     if (element['UpdateName'].startsWith(capitalzedValue)) {
+    //       setState(() {
+    //         tempSearchStore.add(element);
+    //       });
+    //     }
+    //   });
+    // }
+
+    var capitalzedValue = value.isNotEmpty
+        ? value.substring(0, 1).toUpperCase() + value.substring(1)
+        : "";
+
     if (queryResultSet.isEmpty && value.length == 1) {
       DatabaseMethods().search(value).then((QuerySnapshot docs) {
         for (int i = 0; i < docs.docs.length; ++i) {
