@@ -118,7 +118,7 @@ class _AdminLoginState extends State<AdminLogin> {
           ScaffoldMessenger.of(context).showSnackBar(SnackBar(
               backgroundColor: Colors.redAccent,
               content: Text(
-                "Your id is not correct",
+                "Id của bạn không đúng",
                 style: TextStyle(fontSize: 20.0),
               )));
         } else if (result.data()['password'] !=
@@ -126,7 +126,7 @@ class _AdminLoginState extends State<AdminLogin> {
           ScaffoldMessenger.of(context).showSnackBar(SnackBar(
               backgroundColor: Colors.redAccent,
               content: Text(
-                "Your password is not correct",
+                "Mật khẩu của bạn không đúng",
                 style: TextStyle(fontSize: 20.0),
               )));
         } else {

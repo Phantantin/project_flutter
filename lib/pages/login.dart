@@ -1,7 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:shopping_app_1/pages/bottomnav.dart';
-import 'package:shopping_app_1/pages/home.dart';
 import 'package:shopping_app_1/pages/signup.dart';
 import 'package:shopping_app_1/widget/support_widget.dart';
 
@@ -15,8 +14,8 @@ class LogIn extends StatefulWidget {
 class _LogInState extends State<LogIn> {
   String email = "", password = "";
 
-  TextEditingController emailController = new TextEditingController();
-  TextEditingController passwordController = new TextEditingController();
+  TextEditingController emailController = TextEditingController();
+  TextEditingController passwordController = TextEditingController();
 
   final _formKey = GlobalKey<FormState>();
 
@@ -31,14 +30,14 @@ class _LogInState extends State<LogIn> {
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
             backgroundColor: Colors.redAccent,
             content: Text(
-              "No User Found For that Email!",
+              "Không tìm thấy người dùng với email này!",
               style: TextStyle(fontSize: 20.0),
             )));
       } else if (e.code == "wrong-password") {
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
             backgroundColor: Colors.redAccent,
             content: Text(
-              "Wrong Password Provided by User",
+              "Mật khẩu không đúng!",
               style: TextStyle(fontSize: 20.0),
             )));
       }
@@ -60,80 +59,39 @@ class _LogInState extends State<LogIn> {
                 Image.asset("images/login.png"),
                 Center(
                   child: Text(
-                    "Sign In",
+                    "Đăng Nhập",
                     style: AppWidget.semiboldTextFeildStyle(),
                   ),
                 ),
-                SizedBox(
-                  height: 20.0,
-                ),
+                SizedBox(height: 20.0),
                 Text(
-                  "Please enter the details below to\n                       cotinue.",
+                  "Vui lòng nhập thông tin bên dưới để tiếp tục.",
                   style: AppWidget.lightTextFeildStyle(),
                 ),
-                SizedBox(
-                  height: 40.0,
-                ),
+                SizedBox(height: 40.0),
                 Text(
                   "Email",
                   style: AppWidget.semiboldTextFeildStyle(),
                 ),
-                SizedBox(
-                  height: 20.0,
-                ),
-                Container(
-                  padding: EdgeInsets.only(left: 20.0),
-                  decoration: BoxDecoration(
-                      color: Color(0xFFF4F5F9),
-                      borderRadius: BorderRadius.circular(10)),
-                  child: TextFormField(
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return "Please Enter your Email";
-                      }
-                      return null;
-                    },
-                    controller: emailController,
-                    decoration: InputDecoration(
-                        border: InputBorder.none, hintText: "Email"),
-                  ),
-                ),
-                SizedBox(
-                  height: 20.0,
-                ),
+                SizedBox(height: 20.0),
+                _buildTextField(
+                    emailController, "Email", "Vui lòng nhập email của bạn",
+                    emailValidation: true),
+                SizedBox(height: 20.0),
                 Text(
-                  "Password",
+                  "Mật khẩu",
                   style: AppWidget.semiboldTextFeildStyle(),
                 ),
-                SizedBox(
-                  height: 20.0,
-                ),
-                Container(
-                  padding: EdgeInsets.only(left: 20.0),
-                  decoration: BoxDecoration(
-                      color: Color(0xFFF4F5F9),
-                      borderRadius: BorderRadius.circular(10)),
-                  child: TextFormField(
-                    obscureText: true,
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return "Please Enter your Password";
-                      }
-                      return null;
-                    },
-                    controller: passwordController,
-                    decoration: InputDecoration(
-                        border: InputBorder.none, hintText: "Password"),
-                  ),
-                ),
-                SizedBox(
-                  height: 20.0,
-                ),
+                SizedBox(height: 20.0),
+                _buildTextField(passwordController, "Mật khẩu",
+                    "Vui lòng nhập mật khẩu của bạn",
+                    obscureText: true, passwordValidation: true),
+                SizedBox(height: 20.0),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
                     Text(
-                      "Forgot Password?",
+                      "Quên mật khẩu?",
                       style: TextStyle(
                           color: Colors.green,
                           fontSize: 18,
@@ -141,9 +99,7 @@ class _LogInState extends State<LogIn> {
                     ),
                   ],
                 ),
-                SizedBox(
-                  height: 30.0,
-                ),
+                SizedBox(height: 30.0),
                 GestureDetector(
                   onTap: () {
                     if (_formKey.currentState!.validate()) {
@@ -151,8 +107,8 @@ class _LogInState extends State<LogIn> {
                         email = emailController.text;
                         password = passwordController.text;
                       });
+                      userLogin();
                     }
-                    userLogin();
                   },
                   child: Center(
                     child: Container(
@@ -164,7 +120,7 @@ class _LogInState extends State<LogIn> {
                       ),
                       child: Center(
                         child: Text(
-                          "LOGIN",
+                          "ĐĂNG NHẬP",
                           style: TextStyle(
                               color: Colors.white,
                               fontSize: 18.0,
@@ -174,14 +130,12 @@ class _LogInState extends State<LogIn> {
                     ),
                   ),
                 ),
-                SizedBox(
-                  height: 20.0,
-                ),
+                SizedBox(height: 20.0),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
-                      "Don't have an acount? ",
+                      "Bạn chưa có tài khoản? ",
                       style: AppWidget.lightTextFeildStyle(),
                     ),
                     GestureDetector(
@@ -190,7 +144,7 @@ class _LogInState extends State<LogIn> {
                             MaterialPageRoute(builder: (context) => SignUp()));
                       },
                       child: Text(
-                        "Sign Up",
+                        "Đăng Ký",
                         style: TextStyle(
                             color: Colors.green,
                             fontSize: 18,
@@ -202,6 +156,41 @@ class _LogInState extends State<LogIn> {
               ],
             ),
           ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildTextField(TextEditingController controller, String labelText,
+      String validationMessage,
+      {bool obscureText = false,
+      bool emailValidation = false,
+      bool passwordValidation = false}) {
+    return Container(
+      padding: EdgeInsets.only(left: 20.0),
+      decoration: BoxDecoration(
+        color: Color(0xFFF4F5F9),
+        borderRadius: BorderRadius.circular(10),
+      ),
+      child: TextFormField(
+        controller: controller,
+        obscureText: obscureText,
+        validator: (value) {
+          if (value == null || value.isEmpty) {
+            return validationMessage;
+          }
+          if (emailValidation &&
+              !RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(value)) {
+            return "Email không hợp lệ";
+          }
+          if (passwordValidation && value.length < 6) {
+            return "Mật khẩu không đúng. Vui lòng nhập lại";
+          }
+          return null;
+        },
+        decoration: InputDecoration(
+          border: InputBorder.none,
+          hintText: labelText,
         ),
       ),
     );

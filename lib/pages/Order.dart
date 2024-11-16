@@ -22,9 +22,16 @@ class _OrderState extends State<Order> {
   Stream? orderStream;
 
   getontheload() async {
-    await getthesharedpref();
-    orderStream = await DatabaseMethods().getOrders(email!);
-    setState(() {});
+    await getthesharedpref(); // Assuming this fetches shared preferences.
+
+    // Ensure email is not null before using it
+    if (email != null) {
+      orderStream = await DatabaseMethods().getOrders(email!);
+      setState(() {});
+    } else {
+      // Handle the case where email is null (e.g., show an error or fallback)
+      print("Email is null, cannot fetch orders.");
+    }
   }
 
   @override
