@@ -21,22 +21,30 @@ class DatabaseMethods {
         .add(userInfoMap);
   }
 
-  updateStatus(String id) async {
-    return await FirebaseFirestore.instance
-        .collection("Orders")
-        .doc(id)
-        .update({"Status": "Delivered"});
-  }
-
   Future<Stream<QuerySnapshot>> getProducts(String category) async {
     return await FirebaseFirestore.instance.collection(category).snapshots();
   }
 
-  Future<Stream<QuerySnapshot>> allOrders() async {
-    return await FirebaseFirestore.instance
+// Hàm lấy tất cả các đơn hàng có trạng thái "On the way"
+  // Stream<QuerySnapshot> allOrders() {
+  //   return FirebaseFirestore.instance
+  //       .collection("Orders")
+  //       .where("Status", isEqualTo: "On the way")
+  //       .snapshots();
+  // }
+
+  Stream<QuerySnapshot> allOrders() {
+    return FirebaseFirestore.instance
         .collection("Orders")
-        .where("Status", isEqualTo: "On the way")
-        .snapshots();
+        .snapshots(); // Lấy tất cả đơn hàng
+  }
+
+// Hàm cập nhật trạng thái đơn hàng thành "Delivered"
+  Future<void> updateStatus(String id) async {
+    await FirebaseFirestore.instance
+        .collection("Orders")
+        .doc(id)
+        .update({"Status": "Delivered"});
   }
 
   Future<Stream<QuerySnapshot>> getOrders(String email) async {

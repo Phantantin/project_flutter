@@ -5,7 +5,6 @@ import 'package:shopping_app_1/pages/bottomnav.dart';
 import 'package:shopping_app_1/pages/login.dart';
 import 'package:shopping_app_1/services/database.dart';
 import 'package:shopping_app_1/services/shared_pref.dart';
-
 import '../widget/support_widget.dart';
 
 class SignUp extends StatefulWidget {
@@ -18,20 +17,19 @@ class SignUp extends StatefulWidget {
 class _SignUpState extends State<SignUp> {
   String? name, email, password;
 
-  TextEditingController nameController = new TextEditingController();
-  TextEditingController emailController = new TextEditingController();
-  TextEditingController passwordController = new TextEditingController();
+  final TextEditingController nameController = TextEditingController();
+  final TextEditingController emailController = TextEditingController();
+  final TextEditingController passwordController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
-    // Thiết lập ngôn ngữ cho Firebase thành tiếng Việt
     FirebaseAuth.instance.setLanguageCode("vi");
-    print(FirebaseAuth.instance.languageCode); // In ra ngôn ngữ hiện tại
+    print(FirebaseAuth.instance.languageCode);
   }
 
-  registertion() async {
-    if (password != null && name != null && email != null) {
+  Future<void> register() async {
+    if (name != null && email != null && password != null) {
       try {
         UserCredential userCredential = await FirebaseAuth.instance
             .createUserWithEmailAndPassword(email: email!, password: password!);
@@ -39,46 +37,44 @@ class _SignUpState extends State<SignUp> {
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
             backgroundColor: Colors.greenAccent,
             content: Text(
-              "Registered Successfully",
+              "Đăng ký thành công",
               style: TextStyle(fontSize: 20.0),
             )));
-        String Id = randomAlphaNumeric(10);
+
+        String userId = randomAlphaNumeric(10);
         await SharedPreferenceHelper().saveUserEmail(emailController.text);
-        await SharedPreferenceHelper().saveUserId(Id);
+        await SharedPreferenceHelper().saveUserId(userId);
         await SharedPreferenceHelper().saveUserName(nameController.text);
-        await SharedPreferenceHelper().saveUserImage(
-            "https://hoidulich.net/wp-content/uploads/2021/07/Top-10-buc-anh-dep-nhat-giai-Nhiep-anh-thien-van-cua-nam.jpg");
+        await SharedPreferenceHelper().saveUserImage("images/avatar.png");
+
         Map<String, dynamic> userInfoMap = {
           "Name": nameController.text,
           "Email": emailController.text,
-          "Id": Id,
-          "Image":
-              "https://hoidulich.net/wp-content/uploads/2021/07/Top-10-buc-anh-dep-nhat-giai-Nhiep-anh-thien-van-cua-nam.jpg",
+          "Id": userId,
+          "Hình ảnh": "images/avatar.png",
         };
-        await DatabaseMethods().addUserDetails(userInfoMap, Id);
+        await DatabaseMethods().addUserDetails(userInfoMap, userId);
         Navigator.push(
             context, MaterialPageRoute(builder: (context) => LogIn()));
       } on FirebaseException catch (e) {
+        String message = "";
         if (e.code == "weak-password") {
-          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-              backgroundColor: Colors.redAccent,
-              content: Text(
-                "Password Provided is to weak",
-                style: TextStyle(fontSize: 20.0),
-              )));
+          message = "Mật khẩu cung cấp quá yếu";
         } else if (e.code == "email-already-in-use") {
-          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-              backgroundColor: Colors.redAccent,
-              content: Text(
-                "Account Already exsists",
-                style: TextStyle(fontSize: 20.0),
-              )));
+          message = "Tài khoản đã tồn tại";
         }
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+            backgroundColor: Colors.redAccent,
+            content: Text(
+              message,
+              style: TextStyle(fontSize: 20.0),
+            )));
       }
     }
   }
 
-  final _formkey = GlobalKey<FormState>();
+  final _formKey = GlobalKey<FormState>();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -87,119 +83,58 @@ class _SignUpState extends State<SignUp> {
           margin:
               EdgeInsets.only(top: 40.0, left: 20.0, right: 20.0, bottom: 40.0),
           child: Form(
-            key: _formkey,
+            key: _formKey,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Image.asset("images/login.png"),
                 Center(
                   child: Text(
-                    "Sign Up",
+                    "Đăng Ký",
                     style: AppWidget.semiboldTextFeildStyle(),
                   ),
                 ),
-                SizedBox(
-                  height: 20.0,
-                ),
+                SizedBox(height: 20.0),
                 Text(
-                  "Please enter the details below to\n                       cotinue.",
+                  "Vui lòng nhập thông tin bên dưới để tiếp tục.",
                   style: AppWidget.lightTextFeildStyle(),
                 ),
-                SizedBox(
-                  height: 20.0,
-                ),
+                SizedBox(height: 20.0),
                 Text(
-                  "Name",
+                  "Tên",
                   style: AppWidget.semiboldTextFeildStyle(),
                 ),
-                SizedBox(
-                  height: 20.0,
-                ),
-                Container(
-                  padding: EdgeInsets.only(left: 20.0),
-                  decoration: BoxDecoration(
-                      color: Color(0xFFF4F5F9),
-                      borderRadius: BorderRadius.circular(10)),
-                  child: TextFormField(
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return "please Enter Your Name";
-                      }
-                      return null;
-                    },
-                    controller: nameController,
-                    decoration: InputDecoration(
-                        border: InputBorder.none, hintText: "Name"),
-                  ),
-                ),
-                SizedBox(
-                  height: 40.0,
-                ),
+                SizedBox(height: 20.0),
+                _buildTextField(
+                    nameController, "Tên", "Vui lòng nhập tên của bạn"),
+                SizedBox(height: 40.0),
                 Text(
                   "Email",
                   style: AppWidget.semiboldTextFeildStyle(),
                 ),
-                SizedBox(
-                  height: 20.0,
-                ),
-                Container(
-                  padding: EdgeInsets.only(left: 20.0),
-                  decoration: BoxDecoration(
-                      color: Color(0xFFF4F5F9),
-                      borderRadius: BorderRadius.circular(10)),
-                  child: TextFormField(
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return "please Enter Your Email";
-                      }
-                      return null;
-                    },
-                    controller: emailController,
-                    decoration: InputDecoration(
-                        border: InputBorder.none, hintText: "Email"),
-                  ),
-                ),
-                SizedBox(
-                  height: 20.0,
-                ),
+                SizedBox(height: 20.0),
+                _buildTextField(
+                    emailController, "Email", "Vui lòng nhập email của bạn",
+                    emailValidation: true),
+                SizedBox(height: 20.0),
                 Text(
-                  "Password",
+                  "Mật khẩu",
                   style: AppWidget.semiboldTextFeildStyle(),
                 ),
-                SizedBox(
-                  height: 20.0,
-                ),
-                Container(
-                  padding: EdgeInsets.only(left: 20.0),
-                  decoration: BoxDecoration(
-                      color: Color(0xFFF4F5F9),
-                      borderRadius: BorderRadius.circular(10)),
-                  child: TextFormField(
-                    obscureText: true,
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return "Please Enter Your Password";
-                      }
-                      return null;
-                    },
-                    controller: passwordController,
-                    decoration: InputDecoration(
-                        border: InputBorder.none, hintText: "Password"),
-                  ),
-                ),
-                SizedBox(
-                  height: 30.0,
-                ),
+                SizedBox(height: 20.0),
+                _buildTextField(passwordController, "Mật khẩu",
+                    "Vui lòng nhập mật khẩu của bạn",
+                    obscureText: true, passwordValidation: true),
+                SizedBox(height: 30.0),
                 GestureDetector(
                   onTap: () {
-                    if (_formkey.currentState!.validate()) {
+                    if (_formKey.currentState!.validate()) {
                       setState(() {
                         name = nameController.text;
                         email = emailController.text;
                         password = passwordController.text;
                       });
-                      // Đảm bảo hàm đăng ký chỉ được gọi khi form hợp lệ
-                      registertion();
+                      register();
                     }
                   },
                   child: Center(
@@ -212,7 +147,7 @@ class _SignUpState extends State<SignUp> {
                       ),
                       child: Center(
                         child: Text(
-                          "SIGN UP",
+                          "ĐĂNG KÝ",
                           style: TextStyle(
                               color: Colors.white,
                               fontSize: 18.0,
@@ -222,14 +157,12 @@ class _SignUpState extends State<SignUp> {
                     ),
                   ),
                 ),
-                SizedBox(
-                  height: 20.0,
-                ),
+                SizedBox(height: 20.0),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
-                      "Already have an acount? ",
+                      "Bạn đã có tài khoản? ",
                       style: AppWidget.lightTextFeildStyle(),
                     ),
                     GestureDetector(
@@ -238,7 +171,7 @@ class _SignUpState extends State<SignUp> {
                             MaterialPageRoute(builder: (context) => LogIn()));
                       },
                       child: Text(
-                        "Sign In",
+                        "Đăng Nhập",
                         style: TextStyle(
                             color: Colors.green,
                             fontSize: 18,
@@ -246,10 +179,45 @@ class _SignUpState extends State<SignUp> {
                       ),
                     ),
                   ],
-                )
+                ),
               ],
             ),
           ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildTextField(TextEditingController controller, String labelText,
+      String validationMessage,
+      {bool obscureText = false,
+      bool emailValidation = false,
+      bool passwordValidation = false}) {
+    return Container(
+      padding: EdgeInsets.only(left: 20.0),
+      decoration: BoxDecoration(
+        color: Color(0xFFF4F5F9),
+        borderRadius: BorderRadius.circular(10),
+      ),
+      child: TextFormField(
+        controller: controller,
+        obscureText: obscureText,
+        validator: (value) {
+          if (value == null || value.isEmpty) {
+            return validationMessage;
+          }
+          if (emailValidation &&
+              !RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(value)) {
+            return "Email không hợp lệ";
+          }
+          if (passwordValidation && value.length < 6) {
+            return "Mật khẩu phải có hơn 6 ký tự";
+          }
+          return null;
+        },
+        decoration: InputDecoration(
+          border: InputBorder.none,
+          hintText: labelText,
         ),
       ),
     );
