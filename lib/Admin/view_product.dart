@@ -30,23 +30,25 @@ class _ViewProductState extends State<ViewProduct> {
 
   // Hàm xử lý khi xóa sản phẩm
   void deleteProduct(String docId) async {
-    bool confirmDelete = await showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Xác nhận'),
-        content: const Text('Bạn có chắc chắn muốn xóa sản phẩm này không?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(false),
-            child: const Text('Hủy'),
+    bool confirmDelete = (await showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: const Text('Xác nhận'),
+            content:
+                const Text('Bạn có chắc chắn muốn xóa sản phẩm này không?'),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(false),
+                child: const Text('Hủy'),
+              ),
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(true),
+                child: const Text('Xóa'),
+              ),
+            ],
           ),
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(true),
-            child: const Text('Xóa'),
-          ),
-        ],
-      ),
-    );
+        )) ??
+        false; // Nếu null, mặc định trả về false
 
     if (confirmDelete) {
       await FirebaseFirestore.instance

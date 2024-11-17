@@ -87,12 +87,12 @@ class _AllUsersState extends State<AllUsers> {
                         ),
                       ),
                       // Các nút Edit và Delete
-                      IconButton(
-                        icon: Icon(Icons.edit),
-                        onPressed: () {
-                          _editUser(ds);
-                        },
-                      ),
+                      // IconButton(
+                      //   icon: Icon(Icons.edit),
+                      //   onPressed: () {
+                      //     _editUser(ds);
+                      //   },
+                      // ),
                       IconButton(
                         icon: Icon(Icons.delete),
                         onPressed: () {

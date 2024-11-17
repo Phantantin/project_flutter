@@ -45,13 +45,15 @@ class _SignUpState extends State<SignUp> {
         await SharedPreferenceHelper().saveUserEmail(emailController.text);
         await SharedPreferenceHelper().saveUserId(userId);
         await SharedPreferenceHelper().saveUserName(nameController.text);
-        await SharedPreferenceHelper().saveUserImage("images/avatar.png");
+        await SharedPreferenceHelper().saveUserImage(
+            "https://hoidulich.net/wp-content/uploads/2021/07/Top-10-buc-anh-dep-nhat-giai-Nhiep-anh-thien-van-cua-nam.jpg");
 
         Map<String, dynamic> userInfoMap = {
           "Name": nameController.text,
           "Email": emailController.text,
           "Id": userId,
-          "Hình ảnh": "images/avatar.png",
+          "Image":
+              "https://hoidulich.net/wp-content/uploads/2021/07/Top-10-buc-anh-dep-nhat-giai-Nhiep-anh-thien-van-cua-nam.jpg",
         };
         await DatabaseMethods().addUserDetails(userInfoMap, userId);
         Navigator.push(
