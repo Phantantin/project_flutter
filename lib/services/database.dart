@@ -21,8 +21,14 @@ class DatabaseMethods {
         .add(userInfoMap);
   }
 
+  // Future<Stream<QuerySnapshot>> getProducts(String category) async {
+  //   return await FirebaseFirestore.instance.collection(category).snapshots();
+  // }
   Future<Stream<QuerySnapshot>> getProducts(String category) async {
-    return await FirebaseFirestore.instance.collection(category).snapshots();
+    return FirebaseFirestore.instance
+        .collection('Products')
+        .where('Category', isEqualTo: category)
+        .snapshots();
   }
 
 // Hàm lấy tất cả các đơn hàng có trạng thái "On the way"

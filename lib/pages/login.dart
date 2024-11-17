@@ -19,28 +19,36 @@ class _LogInState extends State<LogIn> {
 
   final _formKey = GlobalKey<FormState>();
 
+  // Hàm đăng nhập người dùng
   userLogin() async {
     try {
-      await FirebaseAuth.instance
-          .signInWithEmailAndPassword(email: email, password: password);
-      Navigator.push(
+      // Thử đăng nhập với email và mật khẩu
+      await FirebaseAuth.instance.signInWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
+      // Nếu đăng nhập thành công, điều hướng tới màn hình BottomNav
+      Navigator.pushReplacement(
           context, MaterialPageRoute(builder: (context) => BottomNav()));
     } on FirebaseAuthException catch (e) {
+      // Xử lý lỗi nếu xảy ra
+      String errorMessage = '';
       if (e.code == "user-not-found") {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-            backgroundColor: Colors.redAccent,
-            content: Text(
-              "Không tìm thấy người dùng với email này!",
-              style: TextStyle(fontSize: 20.0),
-            )));
+        errorMessage = "Không tìm thấy người dùng với email này!";
       } else if (e.code == "wrong-password") {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-            backgroundColor: Colors.redAccent,
-            content: Text(
-              "Mật khẩu không đúng!",
-              style: TextStyle(fontSize: 20.0),
-            )));
+        errorMessage = "Mật khẩu không đúng!";
+      } else {
+        errorMessage = "Lỗi đăng nhập. Vui lòng thử lại.";
       }
+
+      // Hiển thị thông báo lỗi trên giao diện
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        backgroundColor: Colors.redAccent,
+        content: Text(
+          errorMessage,
+          style: TextStyle(fontSize: 20.0),
+        ),
+      ));
     }
   }
 
@@ -56,7 +64,10 @@ class _LogInState extends State<LogIn> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                // Logo hoặc hình ảnh đăng nhập
                 Image.asset("images/login.png"),
+
+                // Tiêu đề đăng nhập
                 Center(
                   child: Text(
                     "Đăng Nhập",
@@ -64,11 +75,15 @@ class _LogInState extends State<LogIn> {
                   ),
                 ),
                 SizedBox(height: 20.0),
+
+                // Mô tả về đăng nhập
                 Text(
                   "Vui lòng nhập thông tin bên dưới để tiếp tục.",
                   style: AppWidget.lightTextFeildStyle(),
                 ),
                 SizedBox(height: 40.0),
+
+                // Label và trường nhập email
                 Text(
                   "Email",
                   style: AppWidget.semiboldTextFeildStyle(),
@@ -77,7 +92,10 @@ class _LogInState extends State<LogIn> {
                 _buildTextField(
                     emailController, "Email", "Vui lòng nhập email của bạn",
                     emailValidation: true),
+
                 SizedBox(height: 20.0),
+
+                // Label và trường nhập mật khẩu
                 Text(
                   "Mật khẩu",
                   style: AppWidget.semiboldTextFeildStyle(),
@@ -86,7 +104,10 @@ class _LogInState extends State<LogIn> {
                 _buildTextField(passwordController, "Mật khẩu",
                     "Vui lòng nhập mật khẩu của bạn",
                     obscureText: true, passwordValidation: true),
+
                 SizedBox(height: 20.0),
+
+                // Link quên mật khẩu
                 Row(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
@@ -99,7 +120,10 @@ class _LogInState extends State<LogIn> {
                     ),
                   ],
                 ),
+
                 SizedBox(height: 30.0),
+
+                // Nút đăng nhập
                 GestureDetector(
                   onTap: () {
                     if (_formKey.currentState!.validate()) {
@@ -107,7 +131,7 @@ class _LogInState extends State<LogIn> {
                         email = emailController.text;
                         password = passwordController.text;
                       });
-                      userLogin();
+                      userLogin(); // Gọi hàm đăng nhập khi form đã validate
                     }
                   },
                   child: Center(
@@ -130,7 +154,10 @@ class _LogInState extends State<LogIn> {
                     ),
                   ),
                 ),
+
                 SizedBox(height: 20.0),
+
+                // Liên kết tới màn hình đăng ký
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -161,6 +188,7 @@ class _LogInState extends State<LogIn> {
     );
   }
 
+  // Widget tạo các trường nhập liệu với validator
   Widget _buildTextField(TextEditingController controller, String labelText,
       String validationMessage,
       {bool obscureText = false,

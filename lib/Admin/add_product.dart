@@ -24,15 +24,9 @@ class _AddProductState extends State<AddProduct> {
   TextEditingController nameController = TextEditingController();
   TextEditingController priceController = TextEditingController();
   TextEditingController detailController = TextEditingController();
-  String? editProductId;
-
-  Future<void> requestPermissions() async {
-    await Permission.camera.request();
-    await Permission.photos.request();
-  }
+  String? value;
 
   final _formKey = GlobalKey<FormState>();
-  String? value;
   final List<String> categoryItems = ['Watch', 'Laptop', 'TV', 'Headphones'];
 
   @override
@@ -48,6 +42,13 @@ class _AddProductState extends State<AddProduct> {
     }
   }
 
+  // Yêu cầu quyền truy cập ảnh
+  Future<void> requestPermissions() async {
+    await Permission.camera.request();
+    await Permission.photos.request();
+  }
+
+  // Lấy ảnh từ gallery
   Future getImage() async {
     var image = await _picker.pickImage(source: ImageSource.gallery);
     if (image != null) {
@@ -57,6 +58,7 @@ class _AddProductState extends State<AddProduct> {
     }
   }
 
+  // Kiểm tra và validate các trường nhập liệu
   String? validateName(String? value) {
     if (value == null || value.isEmpty) {
       return "Vui lòng nhập tên sản phẩm";
@@ -81,14 +83,15 @@ class _AddProductState extends State<AddProduct> {
     return null;
   }
 
+  // Upload ảnh và dữ liệu sản phẩm lên Firestore
   Future<void> uploadItem() async {
     // Kiểm tra xem có ảnh mới không và tên sản phẩm có trống không
     if ((selectedImage != null ||
             widget.product != null && widget.product!['Image'] != null) &&
         nameController.text.isNotEmpty) {
-      String addId = editProductId ?? randomAlphaNumeric(10);
+      String addId = widget.productId ?? randomAlphaNumeric(10);
       Reference firebaseStorageRef =
-          FirebaseStorage.instance.ref().child("blogImage").child(addId);
+          FirebaseStorage.instance.ref().child("productImages").child(addId);
 
       // Nếu có ảnh mới được chọn, upload lên Firebase Storage và lấy URL
       if (selectedImage != null) {
@@ -149,7 +152,7 @@ class _AddProductState extends State<AddProduct> {
             child: const Icon(Icons.arrow_back_ios_new_outlined)),
         title: Center(
           child: Text(
-            widget.productId != null ? "Sủa sản phẩm" : "Thêm sản phẩm",
+            widget.productId != null ? "Sửa sản phẩm" : "Thêm sản phẩm",
             style: AppWidget.semiboldTextFeildStyle(),
           ),
         ),
